@@ -41,7 +41,7 @@ export default function Results() {
   };
 
   return <>
-    <PageHeader eyebrow="Result published" title={result.exam.title} text={`Submitted ${new Date(result.submittedAt).toLocaleString()}`} action={<button onClick={download} className="btn-primary"><HiOutlineArrowDownTray/>Download PDF</button>}/>
+    <PageHeader eyebrow="CodingClave Development LLP" title={`${result.exam.title} — Official Result`} text={`Institute assessment record · Submitted ${new Date(result.submittedAt).toLocaleString()}`} action={<button onClick={download} className="btn-primary"><HiOutlineArrowDownTray/>Download PDF</button>}/>
     <div className="mx-auto max-w-4xl"><ResultTemplate result={result}/></div>
   </>;
 }

@@ -57,6 +57,8 @@ Create a Google OAuth 2.0 Web Client and add `http://localhost:5173` as an autho
 
 Backend variables are documented in `backend/.env.example`. Use a 32+ byte random value for `JWT_SECRET`. Set `GOOGLE_CLIENT_ID` to the OAuth Web Client ID and `CLIENT_URL` to the exact Vercel origin; comma-separated origins are supported.
 
+Set `ADMIN_SECRET_KEY` only in the backend environment. Administrator sign-in verifies this key before opening Google account selection, and the backend verifies it again with the Google credential. Never expose this value through a `VITE_*` variable.
+
 Frontend:
 
 | Variable | Meaning |

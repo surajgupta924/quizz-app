@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User.js';
 import ApiError from '../utils/ApiError.js';
@@ -6,11 +7,25 @@ import { sendToken } from '../utils/sendToken.js';
 
 const googleClient = new OAuth2Client();
 const googleClientId = process.env.GOOGLE_CLIENT_ID || '853043782431-aqt6s08th1uob7tcf41kha5f77m03r7b.apps.googleusercontent.com';
+const defaultAdminSecretHash = 'cac22749f3eda89ee9b4f5524388376e3da780ac87ec855bd57e74dcdb6e4201';
+const hashSecret = value => crypto.createHash('sha256').update(String(value || '')).digest();
+const adminSecretIsValid = value => {
+  const expected = process.env.ADMIN_SECRET_KEY ? hashSecret(process.env.ADMIN_SECRET_KEY) : Buffer.from(defaultAdminSecretHash, 'hex');
+  return crypto.timingSafeEqual(hashSecret(value), expected);
+};
+
+export const verifyAdminSecret = asyncHandler(async (req, res) => {
+  if (!adminSecretIsValid(req.body.secret)) throw new ApiError(403, 'Invalid administrator secret key');
+  res.json({ success: true, message: 'Administrator key verified' });
+});
 
 export const googleAuth = asyncHandler(async (req, res) => {
-  const { credential, role } = req.body;
+  const { credential, role, adminSecret } = req.body;
   if (!credential || !['admin', 'student'].includes(role)) {
     throw new ApiError(422, 'Google credential and a valid role are required');
+  }
+  if (role === 'admin' && !adminSecretIsValid(adminSecret)) {
+    throw new ApiError(403, 'Invalid administrator secret key');
   }
   let payload;
   try {

@@ -18,7 +18,7 @@ export const startAttempt = asyncHandler(async (req, res) => {
   const now = new Date(); if (now < exam.startAt) throw new ApiError(403, 'The exam has not started yet');
   if (now > exam.endAt) throw new ApiError(403, 'The exam has ended');
   let result = await Result.findOne({ exam: exam._id, student: req.user._id });
-  if (result?.submittedAt) throw new ApiError(409, 'You have already submitted this exam');
+  if (result?.submittedAt) throw new ApiError(409, 'You have already completed this exam. Each student can attempt an exam only once.');
   const questions = await Question.find({ exam: exam._id });
   if (!result) {
     const seed = `${exam._id}:${req.user._id}`;
