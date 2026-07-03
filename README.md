@@ -1,6 +1,6 @@
 # CodingClave Development LLP — Online Examination System
 
-A production-oriented MERN platform for secure, role-based online examinations. It includes one-time administrator onboarding, passwordless OTP login, exam/question management, individualized question and option ordering, a guarded fullscreen exam room, automatic scoring, analytics, leaderboards, and PDF/Excel exports.
+A production-oriented MERN platform for secure, role-based online examinations. It includes one-time administrator onboarding, Google authentication, exam/question management, individualized question and option ordering, a guarded fullscreen exam room, automatic scoring, analytics, leaderboards, and PDF/Excel exports.
 
 ## Architecture
 
@@ -22,17 +22,16 @@ online-examination-system/
         ├── middlewares/        Auth, errors, uploads, validation
         ├── models/             Mongoose schemas
         ├── routes/             Versioned REST routes
-        ├── utils/              OTP, JWT, errors
+        ├── utils/              JWT and error helpers
         └── validators/         Express-validator rules
 ```
 
 ## Data model
 
-- `users`: admins and students, separated with an indexed `role`. Email and mobile are globally unique. Passwords use bcrypt with cost 12.
+- `users`: Google-authenticated admins and students separated with an indexed `role`; email and Google subject identifiers are unique.
 - `exams`: schedule, marking rules, state, instructions, and unique public code.
 - `questions`: exam-scoped options, protected correct answers, marks and difficulty.
 - `results`: one attempt per student/exam, randomized ordering, answers, warnings and computed result.
-- `otps`: HMAC-hashed, five-minute TTL records with a five-attempt ceiling.
 - `notifications`: recipient-scoped messages and read status.
 - `activitylogs`: auditable actor/action/resource records.
 
@@ -52,11 +51,11 @@ npm run dev
 
 Open `http://localhost:5173`. The API runs at `http://localhost:5000`.
 
-For local OTP testing, keep `EXPOSE_OTP=true`. The API returns the code only outside production. Configure the `SMTP_*` variables for Nodemailer. Registration, login, and password-reset OTPs for both admins and students are delivered by email; mobile numbers are contact information only.
+Create a Google OAuth 2.0 Web Client and add `http://localhost:5173` as an authorized JavaScript origin. Set the same client ID as `GOOGLE_CLIENT_ID` in the backend and `VITE_GOOGLE_CLIENT_ID` in the frontend. Google accounts are created automatically on first sign-in; only the first account selecting the administrator role can become the administrator.
 
 ## Environment variables
 
-Backend variables are documented in `backend/.env.example`. Use independent 32+ byte random values for `JWT_SECRET` and `OTP_PEPPER`. Set `CLIENT_URL` to the exact Vercel origin; comma-separated origins are supported.
+Backend variables are documented in `backend/.env.example`. Use a 32+ byte random value for `JWT_SECRET`. Set `GOOGLE_CLIENT_ID` to the OAuth Web Client ID and `CLIENT_URL` to the exact Vercel origin; comma-separated origins are supported.
 
 Frontend:
 
@@ -64,6 +63,7 @@ Frontend:
 |---|---|
 | `VITE_API_URL` | Render API URL ending in `/api/v1` |
 | `VITE_APP_NAME` | Display name |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth 2.0 Web Client ID |
 
 Never commit `.env` files.
 
@@ -73,15 +73,9 @@ All protected routes accept an HttpOnly cookie or `Authorization: Bearer <token>
 
 | Method | Endpoint | Access | Purpose |
 |---|---|---|---|
-| POST | `/api/v1/auth/register/request-otp` | Public | Begin verified registration |
-| POST | `/api/v1/auth/register` | Public | Create admin/student account |
-| POST | `/api/v1/auth/login/request-otp` | Public | Send role-specific login OTP |
-| POST | `/api/v1/auth/login/verify-otp` | Public | Verify and issue JWT |
-| POST | `/api/v1/auth/password/forgot` | Public | Request password reset OTP |
-| POST | `/api/v1/auth/password/reset` | Public | Verify OTP and reset password |
+| POST | `/api/v1/auth/google` | Public | Verify Google ID token and create/sign in user |
 | GET | `/api/v1/auth/me` | Signed in | Current session |
 | PATCH | `/api/v1/auth/profile` | Signed in | Update profile |
-| PATCH | `/api/v1/auth/password` | Signed in | Change password |
 | GET/POST | `/api/v1/exams` | Role scoped | List/create exams |
 | GET/PATCH/DELETE | `/api/v1/exams/:id` | Role scoped | Exam operations |
 | POST | `/api/v1/exams/:id/deploy` | Admin | Publish and return unique URL |
@@ -110,19 +104,19 @@ All protected routes accept an HttpOnly cookie or `Authorization: Bearer <token>
 
 1. Create a Blueprint using `backend/render.yaml`, or a Node web service rooted at `backend`.
 2. Build command: `npm ci`; start command: `npm start`; health path: `/api/health`.
-3. Add all backend variables. Set `NODE_ENV=production`, `EXPOSE_OTP=false`, and `CLIENT_URL=https://your-app.vercel.app`.
-4. Configure Nodemailer SMTP credentials. Use Cloudinary/S3 instead of ephemeral local uploads for production images.
+3. Add all backend variables. Set `NODE_ENV=production`, `CLIENT_URL=https://your-app.vercel.app`, and `GOOGLE_CLIENT_ID` to the OAuth Web Client ID.
+4. Use Cloudinary/S3 instead of ephemeral local uploads for production images.
 
 ### Vercel client
 
 1. Import the repository and set root directory to `client`.
 2. Build command: `npm run build`; output directory: `dist`.
-3. Set `VITE_API_URL=https://your-api.onrender.com/api/v1`.
+3. Set `VITE_API_URL=https://your-api.onrender.com/api/v1` and `VITE_GOOGLE_CLIENT_ID` to the same OAuth Web Client ID.
 4. `vercel.json` provides SPA history fallback.
 
 ## Security notes
 
-Helmet, strict CORS, rate limits, request size limits, Mongo operator sanitization, schema validation, role guards, HttpOnly secure cookies, OTP hashing/TTL, and centralized errors are enabled. Browser anti-cheating is deterrence—not absolute prevention. High-stakes deployments should add server heartbeats, proctoring consent, device fingerprint policy, Redis-backed OTP/rate limiting, CSRF tokens for cookie-only clients, durable object storage, queue-backed email, structured logs, and automated integration tests.
+Helmet, strict CORS, rate limits, request size limits, Mongo operator sanitization, Google ID-token audience verification, role guards, HttpOnly secure cookies, and centralized errors are enabled. Browser anti-cheating is deterrence—not absolute prevention. High-stakes deployments should add server heartbeats, proctoring consent, device fingerprint policy, CSRF tokens for cookie-only clients, durable object storage, structured logs, and automated integration tests.
 
 The client locally checkpoints answers during connectivity interruptions. A browser cannot reliably submit after it has been force-closed; production-grade crash recovery requires a periodic server-side answer sync endpoint and is intentionally distinguished from misleading `beforeunload` claims.
 

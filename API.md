@@ -10,4 +10,4 @@ Successful responses contain `success: true`. Collection endpoints return `items
 }
 ```
 
-Status codes: `200` success, `201` created, `400` invalid OTP/state, `401` unauthenticated, `403` unauthorized/not open, `404` missing, `409` conflict, `415` upload type, `422` validation, and `429` rate limit.
+Status codes: `200` success, `201` created, `400` invalid state, `401` unauthenticated or invalid Google credential, `403` unauthorized/not open, `404` missing, `409` conflict, `415` upload type, `422` validation, and `429` rate limit.
