@@ -11,7 +11,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const buttonRef = useRef(null);
   const dispatch = useDispatch(), navigate = useNavigate(), location = useLocation();
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '853043782431-aqt6s08th1uob7tcf41kha5f77m03r7b.apps.googleusercontent.com';
 
   const handleCredential = useCallback(async response => {
     if (!response.credential) return toast.error('Google did not return a sign-in credential');

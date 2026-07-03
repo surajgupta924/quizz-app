@@ -5,19 +5,18 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { sendToken } from '../utils/sendToken.js';
 
 const googleClient = new OAuth2Client();
+const googleClientId = process.env.GOOGLE_CLIENT_ID || '853043782431-aqt6s08th1uob7tcf41kha5f77m03r7b.apps.googleusercontent.com';
 
 export const googleAuth = asyncHandler(async (req, res) => {
   const { credential, role } = req.body;
   if (!credential || !['admin', 'student'].includes(role)) {
     throw new ApiError(422, 'Google credential and a valid role are required');
   }
-  if (!process.env.GOOGLE_CLIENT_ID) throw new ApiError(503, 'Google authentication is not configured');
-
   let payload;
   try {
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: googleClientId,
     });
     payload = ticket.getPayload();
   } catch {

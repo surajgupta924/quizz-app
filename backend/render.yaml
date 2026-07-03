@@ -16,4 +16,4 @@ services:
       - key: CLIENT_URL
         sync: false
       - key: GOOGLE_CLIENT_ID
-        sync: false
+        value: 853043782431-aqt6s08th1uob7tcf41kha5f77m03r7b.apps.googleusercontent.com
