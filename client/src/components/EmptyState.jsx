@@ -1,0 +1,2 @@
+import { HiOutlineInbox } from 'react-icons/hi2';
+export default function EmptyState({ title = 'Nothing here yet', text = 'New items will appear here.' }) { return <div className="grid min-h-56 place-items-center text-center"><div><HiOutlineInbox className="mx-auto mb-3 text-5xl text-primary-400"/><h3 className="font-bold">{title}</h3><p className="mt-1 text-sm text-slate-500">{text}</p></div></div>; }

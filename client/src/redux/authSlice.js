@@ -1,0 +1,4 @@
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'; import api from '../services/api';
+export const loadMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }) => { try { return (await api.get('/auth/me')).data.user; } catch (e) { return rejectWithValue(e.response?.data?.message); } });
+const slice = createSlice({ name: 'auth', initialState: { user: null, ready: false }, reducers: { setSession: (state, action) => { state.user = action.payload.user; localStorage.setItem('accessToken', action.payload.token); }, clearSession: state => { state.user = null; localStorage.removeItem('accessToken'); } }, extraReducers: builder => builder.addCase(loadMe.fulfilled, (state, action) => { state.user = action.payload; state.ready = true; }).addCase(loadMe.rejected, state => { state.user = null; state.ready = true; }) });
+export const { setSession, clearSession } = slice.actions; export default slice.reducer;

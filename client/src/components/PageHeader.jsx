@@ -1,0 +1,2 @@
+import { motion } from 'framer-motion';
+export default function PageHeader({ eyebrow, title, text, action }) { return <motion.div initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div>{eyebrow && <p className="mb-1 text-xs font-bold uppercase tracking-[.22em] text-primary-600">{eyebrow}</p>}<h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{title}</h1>{text && <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">{text}</p>}</div>{action}</motion.div>; }

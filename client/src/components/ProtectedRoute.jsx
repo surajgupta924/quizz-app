@@ -1,0 +1,2 @@
+import { Navigate, Outlet, useLocation } from 'react-router-dom'; import { useSelector } from 'react-redux'; import Loader from './Loader';
+export default function ProtectedRoute({ role }) { const { user, ready } = useSelector(s => s.auth); const location = useLocation(); if (!ready) return <Loader full/>; if (!user) return <Navigate to="/login" state={{ from: location }} replace/>; if (role && user.role !== role) return <Navigate to="/unauthorized" replace/>; return <Outlet/>; }

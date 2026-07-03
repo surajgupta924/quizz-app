@@ -1,0 +1,1 @@
+export default function Loader({ full = false }) { return <div className={`${full ? 'min-h-screen' : 'min-h-48'} grid place-items-center`}><div className="h-11 w-11 animate-spin rounded-full border-4 border-primary-100 border-t-primary-600"/></div>; }

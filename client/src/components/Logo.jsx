@@ -1,0 +1,2 @@
+import { HiOutlineAcademicCap } from 'react-icons/hi2';
+export default function Logo({ compact = false }) { return <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-primary-600 to-cyan text-2xl text-white shadow-lg"><HiOutlineAcademicCap/></span>{!compact && <div><div className="text-lg font-extrabold tracking-tight">CodingClave Development</div><div className="text-[10px] font-semibold uppercase tracking-[.16em] text-slate-400">Software · Learning · Growth</div></div>}</div>; }

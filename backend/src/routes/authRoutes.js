@@ -1,0 +1,17 @@
+import { Router } from 'express';
+import * as auth from '../controllers/authController.js';
+import { protect } from '../middlewares/auth.js';
+import { upload } from '../middlewares/upload.js';
+import { validate } from '../middlewares/validate.js';
+import { registrationRules, requestRegistrationRules, loginRequestRules, loginVerifyRules } from '../validators/authValidators.js';
+const router = Router();
+router.post('/register/request-otp', requestRegistrationRules, validate, auth.requestRegistrationOtp);
+router.post('/register', upload.single('avatar'), registrationRules, validate, auth.register);
+router.post('/login/request-otp', loginRequestRules, validate, auth.requestLoginOtp);
+router.post('/login/verify-otp', loginVerifyRules, validate, auth.verifyLoginOtp);
+router.post('/password/forgot', auth.requestPasswordReset);
+router.post('/password/reset', auth.resetPassword);
+router.get('/me', protect, auth.me); router.post('/logout', auth.logout);
+router.patch('/profile', protect, upload.single('avatar'), auth.updateProfile);
+router.patch('/password', protect, auth.changePassword);
+export default router;
