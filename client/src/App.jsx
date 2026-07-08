@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AuthLayout from './layouts/AuthLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 import AdminDashboard from './pages/admin/Dashboard';
 import Exams from './pages/admin/Exams';
 import ExamForm from './pages/admin/ExamForm';
@@ -27,7 +28,7 @@ export default function App() {
     <Route path="/" element={<Navigate to="/login" replace/>}/>
     <Route element={<AuthLayout/>}>
       <Route path="login" element={user ? <Navigate to={`/${user.role}`}/> : <Login/>}/>
-      <Route path="register" element={<Navigate to="/login" replace/>}/>
+      <Route path="register" element={user ? <Navigate to={`/${user.role}`}/> : <Register/>}/>
       <Route path="forgot-password" element={<Navigate to="/login" replace/>}/>
     </Route>
     <Route element={<ProtectedRoute role="admin"/>}><Route element={<DashboardLayout/>}>

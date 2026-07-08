@@ -32,6 +32,14 @@ export const results = asyncHandler(async (req, res) => {
   res.json({ success: true, items, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
 });
 
+export const deleteResult = asyncHandler(async (req, res) => {
+  const deleted = await Result.findByIdAndDelete(req.params.id);
+  if (!deleted) {
+    return res.status(404).json({ success: false, message: 'Completed exam record not found' });
+  }
+  res.json({ success: true, message: 'Completed exam record deleted' });
+});
+
 export const leaderboard = asyncHandler(async (req, res) => {
   const items = await Result.find({ exam: req.params.examId, submittedAt: { $ne: null } }).populate('student', 'name avatar college').sort('-score timeTaken').limit(100);
   res.json({ success: true, items: items.map((item, index) => ({ ...item.toObject(), rank: index + 1 })) });

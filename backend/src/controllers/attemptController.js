@@ -70,5 +70,31 @@ export const myResults = asyncHandler(async (req, res) => res.json({ success: tr
 export const resultDetail = asyncHandler(async (req, res) => {
   const filter = { _id: req.params.id }; if (req.user.role === 'student') filter.student = req.user._id;
   const result = await Result.findOne(filter).populate('exam', 'title subject totalMarks passingMarks resultTemplate').populate('student', 'name email mobile college course year');
-  if (!result) throw new ApiError(404, 'Result not found'); res.json({ success: true, result });
+  if (!result) throw new ApiError(404, 'Result not found');
+
+  const questions = await Question.find({ exam: result.exam._id }).select('+correctAnswer');
+  const questionMap = new Map(questions.map(question => [String(question._id), question]));
+  const reviewItems = result.answers
+    .map(answer => {
+      const question = questionMap.get(String(answer.question));
+      if (!question || answer.correct) return null;
+
+      const orderedKeys = result.optionOrders?.get?.(String(question._id)) || question.options.map(option => option.key);
+      const optionsByKey = new Map(question.options.map(option => [option.key, option]));
+
+      return {
+        questionId: question._id,
+        text: question.text,
+        image: question.image,
+        marks: question.marks,
+        negativeMarks: question.negativeMarks,
+        selected: answer.selected || '',
+        correctAnswer: question.correctAnswer,
+        isSkipped: !answer.selected,
+        options: orderedKeys.map(key => optionsByKey.get(key)).filter(Boolean),
+      };
+    })
+    .filter(Boolean);
+
+  res.json({ success: true, result, reviewItems });
 });

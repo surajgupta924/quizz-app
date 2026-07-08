@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api, { messageFrom } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
+import { TemplateSelector } from '../../components/resultTemplates';
+import { normalizeResultTemplate } from '../../constants/resultTemplates';
 
 const toLocalInput = value => {
   const date = new Date(value);
@@ -20,7 +22,7 @@ const initialSchedule = () => {
 const createEmptyExam = () => ({
   title: '', description: '', subject: '', duration: 60,
   ...initialSchedule(),
-  passingMarks: 40, totalMarks: 100, negativeMarking: false, status: 'scheduled', resultTemplate: 'classic',
+  passingMarks: 40, totalMarks: 100, negativeMarking: false, status: 'scheduled', resultTemplate: 'template-01',
 });
 
 export default function ExamForm() {
@@ -35,6 +37,7 @@ export default function ExamForm() {
       setForm({
         ...data.exam,
         startAt: toLocalInput(data.exam.startAt),
+        resultTemplate: normalizeResultTemplate(data.exam.resultTemplate),
       });
     }).catch(error => toast.error(messageFrom(error)));
   }, [id]);
@@ -97,7 +100,11 @@ export default function ExamForm() {
       <label><span className="label">Automatic closing time</span><div className="field flex items-center bg-slate-50 text-slate-600 dark:bg-white/5">{calculatedEnd && !Number.isNaN(calculatedEnd.getTime()) ? calculatedEnd.toLocaleString() : 'Select start time and duration'}</div><p className="mt-1 text-xs text-slate-400">The student link disables automatically at this time.</p></label>
       <Field label="Passing marks" type="number" min="0" name="passingMarks" value={form.passingMarks} onChange={set}/>
       <Field label="Total marks" type="number" min="1" name="totalMarks" value={form.totalMarks} onChange={set}/>
-      <label className="md:col-span-2"><span className="label">Student result template</span><select className="field" name="resultTemplate" value={form.resultTemplate || 'classic'} onChange={set}><option value="classic">Classic scorecard</option><option value="celebration">Celebration</option><option value="minimal">Minimal report</option></select><p className="mt-1 text-xs text-slate-400">Students will see their result using this design.</p></label>
+      <div className="md:col-span-2">
+        <span className="label">Student result template</span>
+        <TemplateSelector value={normalizeResultTemplate(form.resultTemplate)} onChange={value => setForm(current => ({ ...current, resultTemplate: value }))}/>
+        <p className="mt-2 text-xs text-slate-400">The student result page will use the selected certificate design.</p>
+      </div>
       <label className="flex items-center gap-3 rounded-xl border p-4 md:col-span-2"><input type="checkbox" name="negativeMarking" checked={form.negativeMarking} onChange={set} className="h-5 w-5 accent-primary-600"/><span><b>Enable negative marking</b><p className="text-xs text-slate-500">Deduct configured marks for incorrect answers.</p></span></label>
       <div className="flex justify-end gap-3 md:col-span-2"><button type="button" className="btn-ghost" onClick={() => navigate(-1)}>Cancel</button><button disabled={loading} className="btn-primary">{loading ? 'Saving…' : id ? 'Save changes' : 'Schedule exam'}</button></div>
     </form>

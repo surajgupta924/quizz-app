@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { HiOutlineShieldCheck } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
@@ -71,8 +71,8 @@ export default function Login() {
 
   return <div>
     <p className="text-xs font-bold uppercase tracking-[.2em] text-primary-600">Welcome</p>
-    <h2 className="mt-2 text-3xl font-extrabold">Continue with Google</h2>
-    <p className="mt-2 text-sm text-slate-500">One secure Google account for registration and sign-in.</p>
+    <h2 className="mt-2 text-3xl font-extrabold">Sign in with Google</h2>
+    <p className="mt-2 text-sm text-slate-500">Use your verified Google account to access student or admin panels.</p>
     <div className="mt-6 grid grid-cols-2 rounded-xl bg-slate-100 p-1 dark:bg-white/5">
       {['student', 'admin'].map(item => <button key={item} type="button" disabled={loading} onClick={() => selectRole(item)} className={`rounded-lg py-2.5 text-sm font-bold capitalize transition ${role === item ? 'bg-white text-primary-700 shadow dark:bg-white/10 dark:text-white' : 'text-slate-400'}`}>{item}</button>)}
     </div>
@@ -81,6 +81,6 @@ export default function Login() {
       <p className="mb-4 text-sm text-slate-500">You are continuing as <b className="capitalize text-slate-700 dark:text-slate-200">{role}</b>.</p>
       {role === 'admin' && !adminVerified ? <form onSubmit={verifyAdminKey} className="space-y-3"><label className="block text-left"><span className="label">Administrator secret key</span><input required type="password" value={adminSecret} onChange={event => setAdminSecret(event.target.value)} className="field" placeholder="Enter the administrator key" autoComplete="off"/></label><button disabled={loading} className="btn-primary w-full">{loading ? 'Verifying…' : 'Verify key & continue'}</button></form> : clientId ? <div ref={buttonRef} className={`flex min-h-10 justify-center ${loading ? 'pointer-events-none opacity-60' : ''}`}/> : <p className="text-sm font-semibold text-red-500">Google authentication is not configured.</p>}
     </div>
-    <p className="mt-5 text-center text-xs text-slate-400">New Google accounts are created automatically. Only the first administrator can claim the admin role.</p>
+    <p className="mt-5 text-center text-xs text-slate-400">New student? <Link to="/register" className="font-bold text-primary-600">Complete registration first</Link>. Only the first administrator can claim the admin role.</p>
   </div>;
 }
