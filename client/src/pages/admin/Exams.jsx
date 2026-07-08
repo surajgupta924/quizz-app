@@ -34,8 +34,12 @@ export default function Exams() {
 
   const remove = async id => {
     const result = await Swal.fire({
-      title: 'Delete this exam?', text: 'Questions will also be removed.', icon: 'warning',
-      showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'Delete',
+      title: 'Delete this exam?',
+      text: 'Questions and completed test records for this exam will also be removed.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e11d48',
+      confirmButtonText: 'Delete',
     });
     if (!result.isConfirmed) return;
     try {

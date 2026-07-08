@@ -2,7 +2,7 @@ import { HiOutlineCheckCircle, HiOutlineMinusCircle, HiOutlineTrophy, HiOutlineX
 import { getResultTemplate, RESULT_TEMPLATES } from '../constants/resultTemplates';
 
 export function TemplateSelector({ value, onChange }) {
-  return <div className="grid gap-4 lg:grid-cols-2">
+  return <div className="grid gap-4 xl:grid-cols-2">
     {RESULT_TEMPLATES.map(template => {
       const active = template.id === value;
       return <button
@@ -11,7 +11,11 @@ export function TemplateSelector({ value, onChange }) {
         onClick={() => onChange(template.id)}
         className={`overflow-hidden rounded-[1.6rem] border text-left transition hover:-translate-y-0.5 ${active ? 'border-primary-500 ring-4 ring-primary-500/10' : 'border-slate-200 hover:border-primary-300 dark:border-white/10'}`}
       >
-        <TemplatePreview template={template}/>
+        <div className="bg-[#f7f8fc] p-4 dark:bg-[#0d0c1b]">
+          <div className="mx-auto origin-top scale-[0.72]">
+            <CertificateCard template={template} result={previewResult(template)}/>
+          </div>
+        </div>
         <div className="flex items-center justify-between px-4 py-3">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">{template.code}</p>
@@ -26,202 +30,129 @@ export function TemplateSelector({ value, onChange }) {
 
 export function ResultCertificate({ result }) {
   const template = getResultTemplate(result.exam?.resultTemplate);
-  const layout = Number(template.code);
-
-  if ([2, 5].includes(layout)) return <DarkTemplate result={result} template={template}/>;
-  if ([1, 9].includes(layout)) return <LaurelTemplate result={result} template={template}/>;
-  if ([7, 10].includes(layout)) return <ShieldTemplate result={result} template={template}/>;
-  if ([3, 4, 6, 8].includes(layout)) return <RibbonTemplate result={result} template={template}/>;
-  return <SimpleTemplate result={result} template={template}/>;
-}
-
-function TemplatePreview({ template }) {
-  const dark = template.theme === 'dark';
-  return <div className={`p-4 ${dark ? 'bg-slate-950 text-white' : 'bg-white text-slate-800'}`}>
-    <div className={`rounded-[1.2rem] border ${dark ? 'border-white/10 bg-white/5' : 'border-slate-200'} p-3`}>
-      <div className={`rounded-lg bg-gradient-to-r ${template.accent} px-3 py-2 text-white`}>
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-black tracking-[0.25em]">CODING CLAVE</span>
-          <span className={`rounded px-1.5 py-0.5 text-[10px] font-black ${dark ? 'bg-white/15' : 'bg-white/20'}`}>{template.code}</span>
-        </div>
-        <div className={`mt-3 inline-flex rounded-full px-3 py-1 text-[10px] font-bold ${template.ribbon}`}>QUIZ TEST RESULT</div>
-      </div>
-      <div className="mt-4 flex items-center gap-3">
-        <div className={`grid h-14 w-14 place-items-center rounded-full border-4 ${template.frame}`}>
-          <span className="text-xl font-black">C</span>
-        </div>
-        <div className="flex-1 space-y-2">
-          <div className={`h-2 rounded ${dark ? 'bg-white/20' : 'bg-slate-200'}`}/>
-          <div className={`h-2 w-4/5 rounded ${dark ? 'bg-white/15' : 'bg-slate-100'}`}/>
-          <div className={`h-2 w-3/5 rounded ${dark ? 'bg-white/10' : 'bg-slate-100'}`}/>
-        </div>
-      </div>
-    </div>
+  return <div className="flex justify-center">
+    <CertificateCard template={template} result={result}/>
   </div>;
 }
 
-function CertificateShell({ result, template, dark = false, children }) {
-  return <article className={`overflow-hidden rounded-[2rem] border shadow-2xl ${dark ? 'border-white/10 bg-slate-950 text-white shadow-slate-900/30' : 'border-slate-200 bg-white shadow-primary-500/10 dark:border-white/10 dark:bg-[#15132b]'}`}>
-    <header className={`bg-gradient-to-r ${template.accent} px-6 py-7 text-white sm:px-8`}>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/75">CodingClave Development LLP</p>
-          <h2 className="mt-2 text-2xl font-black">Quiz Test Result</h2>
-          <p className="mt-1 text-sm text-white/75">{result.exam?.title} · {result.exam?.subject}</p>
+function previewResult(template) {
+  const base = {
+    student: { name: 'Student Name', college: 'Your College Name' },
+    exam: { subject: 'Subject Name' },
+    score: 86,
+    percentage: 86,
+    rank: rankLabel(template.code),
+    correct: 18,
+    wrong: 2,
+    skipped: 0,
+  };
+  return base;
+}
+
+function CertificateCard({ template, result }) {
+  const dark = template.theme === 'dark';
+  const textMain = dark ? 'text-white' : 'text-slate-900';
+  const textMuted = dark ? 'text-white/70' : 'text-slate-500';
+  const panel = dark ? 'bg-[#091323]' : 'bg-white';
+  const rankTone = dark ? 'text-amber-300' : 'text-slate-700';
+  const qrTone = dark ? 'border-white/20 bg-white text-slate-900' : 'border-slate-300 bg-white text-slate-900';
+  const iconFrame = dark ? 'border-white/30 bg-white/10' : 'border-slate-200 bg-white';
+  const name = result.student?.name || 'Student Name';
+  const college = result.student?.college || 'Registered Student';
+  const subject = result.exam?.subject || result.exam?.title || 'Subject Name';
+  const marks = `${result.score ?? 0} / ${result.exam?.totalMarks ?? 100}`;
+  const rank = rankLabel(result.rank);
+
+  return <article className={`relative w-full max-w-[340px] overflow-hidden rounded-[18px] border shadow-2xl ${panel} ${dark ? 'border-white/10' : 'border-slate-200'}`}>
+    <div className={`h-4 ${template.edge}`}/>
+    <div className={`px-5 pb-4 pt-4 ${textMain}`}>
+      <div className="flex items-start justify-between">
+        <div className="flex gap-3">
+          <div className={`grid h-11 w-11 place-items-center rounded-full border-4 text-lg font-black ${iconFrame}`} style={{ color: template.accent, borderColor: template.accent }}>
+            C
+          </div>
+          <div>
+            <h2 className="text-[18px] font-black uppercase tracking-tight leading-5">Coding Clave</h2>
+            <p className="text-[13px] font-bold uppercase leading-4">Development LLP</p>
+            <p className={`text-[11px] ${textMuted}`}>Code. Create. Clave.</p>
+          </div>
         </div>
-        <div className="rounded-2xl bg-white/15 px-4 py-3 text-right">
-          <p className="text-[11px] uppercase tracking-[0.28em] text-white/70">Template</p>
-          <p className="text-xl font-black">{template.code}</p>
+        <span className={`rounded-md px-2 py-1 text-xs font-black ${dark ? 'bg-white text-slate-900' : 'bg-slate-100 text-slate-700'}`}>{template.code}</span>
+      </div>
+
+      <div className="mt-4 flex justify-center">
+        <div className={`relative px-6 py-2 text-[15px] font-black uppercase tracking-wide text-white ${template.ribbon}`} style={{ clipPath: 'polygon(0 0, 100% 0, 94% 100%, 6% 100%)' }}>
+          Quiz Test Result
         </div>
       </div>
-    </header>
-    {children}
+
+      <div className="mt-5 flex justify-center">
+        <div className={`relative grid h-28 w-28 place-items-center rounded-full border-[7px] ${dark ? 'bg-[#0f1f37]' : 'bg-white'}`} style={{ borderColor: template.accent }}>
+          <div className={`grid h-20 w-20 place-items-center rounded-full border-[7px] ${dark ? 'bg-white text-slate-900' : 'bg-[#0f2147] text-white'}`} style={{ borderColor: dark ? '#d9dee7' : '#e6ebf3' }}>
+            <span className="text-4xl font-black">C</span>
+          </div>
+          {(template.code === '01' || template.code === '09') && <>
+            <span className="absolute -left-8 top-5 text-4xl" style={{ color: template.medal }}>❦</span>
+            <span className="absolute -right-8 top-5 text-4xl" style={{ color: template.medal }}>❦</span>
+          </>}
+        </div>
+      </div>
+
+      <div className={`mt-5 space-y-2.5 text-[12px] ${dark ? 'text-white' : 'text-slate-800'}`}>
+        <InfoRow icon="◧" label="Subject Name" value={subject}/>
+        <InfoRow icon="◨" label="Student Name" value={name}/>
+        <InfoRow icon="✦" label="Marks Obtained" value={marks}/>
+        <InfoRow icon="♛" label="Rank" value={rank}/>
+      </div>
+
+      <div className="mt-5 flex items-end justify-between gap-3">
+        <div className="flex-1">
+          <div className={`h-px ${dark ? 'bg-white/20' : 'bg-slate-300'}`}/>
+          <p className={`mt-2 text-[10px] italic ${textMuted}`}>Authorized Signatory</p>
+          <p className={`mt-1 text-[10px] ${textMuted}`}>{college}</p>
+        </div>
+        <div className={`grid h-16 w-16 grid-cols-5 gap-[2px] rounded border p-1 ${qrTone}`}>
+          {Array.from({ length: 25 }).map((_, index) => <span key={index} className={`${qrDot(index) ? 'bg-slate-900' : 'bg-transparent'}`}/>)}
+        </div>
+      </div>
+    </div>
+    <div className={`flex items-center justify-between px-5 py-3 text-[11px] font-bold ${dark ? 'bg-white/5 text-white/80' : 'bg-slate-50 text-slate-700'}`}>
+      <span>www.codingclave.com</span>
+      <Badge template={template} rank={rank}/>
+    </div>
   </article>;
 }
 
-function LaurelTemplate({ result, template }) {
-  return <CertificateShell result={result} template={template}>
-    <div className="p-6 sm:p-8">
-      <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Student</p>
-          <h3 className="mt-2 text-3xl font-black">{result.student?.name}</h3>
-          <p className="mt-1 text-sm text-slate-500">{result.student?.college || 'CodingClave Candidate'}</p>
-          <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50/70 p-5">
-            <p className="text-sm font-semibold text-amber-700">Certificate summary</p>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <InfoLine label="Score" value={`${result.score} / ${result.exam?.totalMarks}`}/>
-              <InfoLine label="Percentage" value={`${result.percentage}%`}/>
-              <InfoLine label="Correct" value={result.correct}/>
-              <InfoLine label="Wrong" value={result.wrong}/>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-[1.8rem] border border-primary-100 bg-slate-50 p-6 text-center dark:bg-white/5">
-          <div className="mx-auto grid h-24 w-24 place-items-center rounded-full border-[10px] border-amber-300 bg-white text-4xl font-black text-primary-700 shadow-lg">C</div>
-          <p className="mt-5 text-sm font-bold uppercase tracking-[0.25em] text-slate-400">Rank</p>
-          <p className="mt-1 text-5xl font-black text-primary-700 dark:text-primary-300">#{result.rank || '—'}</p>
-          <ResultChip passed={result.passed}/>
-        </div>
-      </div>
-      <FooterStamp result={result}/>
-    </div>
-  </CertificateShell>;
-}
-
-function DarkTemplate({ result, template }) {
-  return <CertificateShell result={result} template={template} dark>
-    <div className="p-6 sm:p-8">
-      <div className="rounded-[1.8rem] border border-white/10 bg-white/5 p-6 text-center backdrop-blur">
-        <p className="text-sm font-bold uppercase tracking-[0.3em] text-white/60">{result.passed ? 'Achievement unlocked' : 'Performance report'}</p>
-        <p className="mt-4 text-6xl font-black">{result.percentage}%</p>
-        <p className="mt-2 text-white/70">{result.student?.name} · {result.score}/{result.exam?.totalMarks} marks</p>
-        <div className="mt-8 grid gap-3 sm:grid-cols-4">
-          <DarkMetric label="Correct" value={result.correct}/>
-          <DarkMetric label="Wrong" value={result.wrong}/>
-          <DarkMetric label="Skipped" value={result.skipped}/>
-          <DarkMetric label="Rank" value={`#${result.rank || '—'}`}/>
-        </div>
-      </div>
-      <p className="mt-5 text-center text-xs text-white/45">Submitted {new Date(result.submittedAt).toLocaleString()}</p>
-    </div>
-  </CertificateShell>;
-}
-
-function RibbonTemplate({ result, template }) {
-  return <CertificateShell result={result} template={template}>
-    <div className="p-6 sm:p-8">
-      <div className="flex flex-col items-start justify-between gap-5 border-b pb-6 sm:flex-row sm:items-center">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Official record</p>
-          <h3 className="mt-2 text-3xl font-black">{result.student?.name}</h3>
-        </div>
-        <span className={`rounded-full px-5 py-2 text-sm font-bold ${result.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{result.passed ? 'PASSED' : 'FAILED'}</span>
-      </div>
-      <div className="grid gap-4 py-6 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric icon={HiOutlineCheckCircle} label="Correct" value={result.correct} color="text-emerald-500"/>
-        <Metric icon={HiOutlineXCircle} label="Wrong" value={result.wrong} color="text-rose-500"/>
-        <Metric icon={HiOutlineMinusCircle} label="Skipped" value={result.skipped} color="text-amber-500"/>
-        <Metric icon={HiOutlineTrophy} label="Rank" value={`#${result.rank || '—'}`} color="text-primary-500"/>
-      </div>
-      <div className="rounded-[1.6rem] bg-slate-50 p-5 dark:bg-white/5">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <InfoLine label="Score" value={`${result.score} / ${result.exam?.totalMarks}`}/>
-          <InfoLine label="Percentage" value={`${result.percentage}%`}/>
-          <InfoLine label="Submitted" value={new Date(result.submittedAt).toLocaleDateString()}/>
-        </div>
-      </div>
-    </div>
-  </CertificateShell>;
-}
-
-function ShieldTemplate({ result, template }) {
-  return <CertificateShell result={result} template={template}>
-    <div className="p-6 sm:p-8">
-      <div className="grid gap-6 md:grid-cols-[220px_1fr]">
-        <div className="rounded-[1.8rem] border border-primary-100 bg-primary-50/70 p-6 text-center dark:bg-primary-500/10">
-          <div className="mx-auto grid h-24 w-24 place-items-center rounded-[2rem] border-4 border-primary-500 bg-white text-4xl font-black text-primary-700 shadow-lg dark:bg-slate-950">C</div>
-          <p className="mt-4 text-sm font-bold uppercase tracking-[0.25em] text-slate-400">Score</p>
-          <p className="mt-1 text-4xl font-black text-primary-700 dark:text-primary-300">{result.score}</p>
-          <p className="text-sm text-slate-500">out of {result.exam?.totalMarks}</p>
-        </div>
-        <div>
-          <h3 className="text-3xl font-black">{result.student?.name}</h3>
-          <p className="mt-1 text-sm text-slate-500">{result.exam?.subject}</p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <InfoLine label="Percentage" value={`${result.percentage}%`}/>
-            <InfoLine label="Rank" value={`#${result.rank || '—'}`}/>
-            <InfoLine label="Correct answers" value={result.correct}/>
-            <InfoLine label="Wrong answers" value={result.wrong}/>
-          </div>
-          <FooterStamp result={result}/>
-        </div>
-      </div>
-    </div>
-  </CertificateShell>;
-}
-
-function SimpleTemplate({ result, template }) {
-  return <CertificateShell result={result} template={template}>
-    <div className="p-6 sm:p-8">
-      <div className="grid gap-4 sm:grid-cols-3">
-        <InfoLine label="Student" value={result.student?.name}/>
-        <InfoLine label="Score" value={`${result.score}/${result.exam?.totalMarks}`}/>
-        <InfoLine label="Percentage" value={`${result.percentage}%`}/>
-      </div>
-      <FooterStamp result={result}/>
-    </div>
-  </CertificateShell>;
-}
-
-function InfoLine({ label, value }) {
-  return <div className="rounded-2xl bg-white/70 p-4 dark:bg-white/5">
-    <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">{label}</p>
-    <p className="mt-1 text-lg font-bold">{value || '—'}</p>
+function InfoRow({ icon, label, value }) {
+  return <div className="grid grid-cols-[18px_88px_12px_1fr] items-center gap-2">
+    <span className="grid h-4 w-4 place-items-center rounded-sm bg-current/10 text-[10px] font-black">{icon}</span>
+    <span className="font-semibold">{label}</span>
+    <span>:</span>
+    <span className="truncate font-medium">{value}</span>
   </div>;
 }
 
-function ResultChip({ passed }) {
-  return <span className={`mt-5 inline-flex rounded-full px-4 py-2 text-sm font-bold ${passed ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{passed ? 'PASSED' : 'FAILED'}</span>;
-}
-
-function DarkMetric({ label, value }) {
-  return <div className="rounded-2xl bg-white/10 p-4">
-    <p className="text-2xl font-black">{value}</p>
-    <p className="text-xs uppercase tracking-[0.2em] text-white/60">{label}</p>
+function Badge({ template, rank }) {
+  const isGold = ['01', '05', '09'].includes(template.code);
+  const bg = isGold ? 'bg-amber-400 text-amber-950' : 'bg-blue-600 text-white';
+  const star = isGold ? '★' : '✪';
+  return <div className={`grid h-12 w-12 place-items-center rounded-full text-[11px] font-black shadow ${bg}`}>
+    <span className="text-center leading-3">{star}<br/>{rank}</span>
   </div>;
 }
 
-function Metric({ icon: Icon, label, value, color }) {
-  return <div className="rounded-2xl bg-slate-50 p-4 text-center dark:bg-white/5">
-    <Icon className={`mx-auto text-3xl ${color}`}/>
-    <p className="mt-2 text-2xl font-extrabold">{value}</p>
-    <p className="text-xs text-slate-400">{label}</p>
-  </div>;
+function rankLabel(rank) {
+  if (!rank) return 'N/A';
+  const num = Number(rank);
+  if (!Number.isFinite(num)) return String(rank);
+  if (num % 100 >= 11 && num % 100 <= 13) return `${num}th`;
+  if (num % 10 === 1) return `${num}st`;
+  if (num % 10 === 2) return `${num}nd`;
+  if (num % 10 === 3) return `${num}rd`;
+  return `${num}th`;
 }
 
-function FooterStamp({ result }) {
-  return <footer className="mt-6 border-t pt-5 text-xs text-slate-400">
-    Issued by CodingClave Development LLP · {new Date(result.submittedAt).toLocaleString()}
-  </footer>;
+function qrDot(index) {
+  const filled = new Set([0, 1, 2, 5, 7, 9, 10, 11, 14, 15, 17, 18, 20, 22, 23, 24]);
+  return filled.has(index);
 }

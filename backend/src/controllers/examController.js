@@ -27,8 +27,14 @@ export const updateExam = asyncHandler(async (req, res) => {
   if (!exam) throw new ApiError(404, 'Exam not found'); res.json({ success: true, exam });
 });
 export const deleteExam = asyncHandler(async (req, res) => {
-  if (await Result.exists({ exam: req.params.id })) throw new ApiError(409, 'An exam with submissions cannot be deleted');
-  await Promise.all([Exam.findByIdAndDelete(req.params.id), Question.deleteMany({ exam: req.params.id })]); res.json({ success: true, message: 'Exam deleted' });
+  const exam = await Exam.findById(req.params.id);
+  if (!exam) throw new ApiError(404, 'Exam not found');
+  await Promise.all([
+    Exam.findByIdAndDelete(req.params.id),
+    Question.deleteMany({ exam: req.params.id }),
+    Result.deleteMany({ exam: req.params.id }),
+  ]);
+  res.json({ success: true, message: 'Exam and all completed test records deleted' });
 });
 export const deployExam = asyncHandler(async (req, res) => {
   const exam = await Exam.findById(req.params.id); if (!exam) throw new ApiError(404, 'Exam not found');

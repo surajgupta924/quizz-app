@@ -1,14 +1,14 @@
 export const RESULT_TEMPLATES = [
-  { id: 'template-01', code: '01', name: 'Laurel Classic', accent: 'from-blue-800 to-sky-500', surface: 'bg-white', ribbon: 'bg-blue-700', frame: 'border-amber-300', theme: 'light' },
-  { id: 'template-02', code: '02', name: 'Neon Orbit', accent: 'from-slate-950 to-blue-700', surface: 'bg-slate-950 text-white', ribbon: 'bg-cyan-500', frame: 'border-cyan-300', theme: 'dark' },
-  { id: 'template-03', code: '03', name: 'Royal Violet', accent: 'from-violet-800 to-fuchsia-500', surface: 'bg-white', ribbon: 'bg-violet-600', frame: 'border-violet-300', theme: 'light' },
-  { id: 'template-04', code: '04', name: 'Teal Crest', accent: 'from-teal-800 to-cyan-500', surface: 'bg-white', ribbon: 'bg-teal-600', frame: 'border-teal-300', theme: 'light' },
-  { id: 'template-05', code: '05', name: 'Golden Prestige', accent: 'from-slate-950 to-amber-500', surface: 'bg-slate-950 text-amber-100', ribbon: 'bg-amber-400 text-slate-950', frame: 'border-amber-400', theme: 'dark' },
-  { id: 'template-06', code: '06', name: 'Orange Merit', accent: 'from-orange-800 to-amber-500', surface: 'bg-white', ribbon: 'bg-orange-500', frame: 'border-orange-300', theme: 'light' },
-  { id: 'template-07', code: '07', name: 'Blue Ribbon', accent: 'from-blue-900 to-sky-500', surface: 'bg-white', ribbon: 'bg-blue-500', frame: 'border-blue-300', theme: 'light' },
-  { id: 'template-08', code: '08', name: 'Green Scholar', accent: 'from-green-800 to-lime-500', surface: 'bg-white', ribbon: 'bg-green-600', frame: 'border-green-300', theme: 'light' },
-  { id: 'template-09', code: '09', name: 'Maroon Honors', accent: 'from-rose-900 to-red-600', surface: 'bg-white', ribbon: 'bg-rose-700', frame: 'border-amber-300', theme: 'light' },
-  { id: 'template-10', code: '10', name: 'Navy Shield', accent: 'from-blue-950 to-blue-600', surface: 'bg-white', ribbon: 'bg-blue-700', frame: 'border-blue-300', theme: 'light' },
+  { id: 'template-01', code: '01', name: 'Blue Laurel', theme: 'light', header: 'bg-[#0f4b7a]', edge: 'bg-[#1d74a4]', ribbon: 'bg-[#1f4d8b]', accent: '#d5a328', medal: '#d8a117' },
+  { id: 'template-02', code: '02', name: 'Dark Neon', theme: 'dark', header: 'bg-[#07183d]', edge: 'bg-[#0a3376]', ribbon: 'bg-[#01b8ec]', accent: '#5fd8ff', medal: '#c8941b' },
+  { id: 'template-03', code: '03', name: 'Purple Seal', theme: 'light', header: 'bg-[#4a227d]', edge: 'bg-[#7a34ae]', ribbon: 'bg-[#7a35b8]', accent: '#7a35b8', medal: '#7a35b8' },
+  { id: 'template-04', code: '04', name: 'Teal Crown', theme: 'light', header: 'bg-[#0f6770]', edge: 'bg-[#1497a6]', ribbon: 'bg-[#1a8f92]', accent: '#1f8d88', medal: '#1f8d88' },
+  { id: 'template-05', code: '05', name: 'Gold Frame', theme: 'dark', header: 'bg-[#081428]', edge: 'bg-[#f2b434]', ribbon: 'bg-[#f4c63d]', accent: '#e2ad25', medal: '#f2b434' },
+  { id: 'template-06', code: '06', name: 'Orange Ribbon', theme: 'light', header: 'bg-[#0b3a73]', edge: 'bg-[#f08b24]', ribbon: 'bg-[#f08b24]', accent: '#e9821b', medal: '#e9821b' },
+  { id: 'template-07', code: '07', name: 'Blue Wave', theme: 'light', header: 'bg-[#0b3f7f]', edge: 'bg-[#2f8fe1]', ribbon: 'bg-[#258be2]', accent: '#2f8fe1', medal: '#1f5fa5' },
+  { id: 'template-08', code: '08', name: 'Green Ribbon', theme: 'light', header: 'bg-[#0d4b34]', edge: 'bg-[#3f9b34]', ribbon: 'bg-[#469d39]', accent: '#4aa03a', medal: '#4aa03a' },
+  { id: 'template-09', code: '09', name: 'Maroon Laurel', theme: 'light', header: 'bg-[#6a1224]', edge: 'bg-[#8f1f31]', ribbon: 'bg-[#7d1427]', accent: '#c89a1e', medal: '#d59a1f' },
+  { id: 'template-10', code: '10', name: 'Royal Blue', theme: 'light', header: 'bg-[#0a3f8f]', edge: 'bg-[#225ec7]', ribbon: 'bg-[#1b50b2]', accent: '#215ac0', medal: '#215ac0' },
 ];
 
 const legacyMap = {
