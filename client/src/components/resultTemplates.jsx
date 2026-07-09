@@ -116,11 +116,11 @@ function CertificateCard({ template, result, certificateRef }) {
 }
 
 function InfoRow({ icon, label, value }) {
-  return <div className="grid grid-cols-[18px_88px_12px_1fr] items-center gap-2">
+  return <div className="grid grid-cols-[18px_96px_10px_minmax(0,1fr)] items-start gap-2">
     <span className="grid h-4 w-4 place-items-center rounded-sm bg-current/10 text-[10px] font-black">{icon}</span>
-    <span className="font-semibold">{label}</span>
-    <span>:</span>
-    <span className="truncate font-medium">{value}</span>
+    <span className="pt-0.5 font-semibold">{label}</span>
+    <span className="pt-0.5">:</span>
+    <span className="break-words pt-0.5 font-medium leading-5">{value}</span>
   </div>;
 }
 

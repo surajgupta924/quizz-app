@@ -28,17 +28,37 @@ export default function Results() {
   const { result, reviewItems } = data;
   const download = async () => {
     if (!certificateRef.current) return;
-    const canvas = await html2canvas(certificateRef.current, {
-      scale: 4,
-      backgroundColor: '#081428',
-      useCORS: true,
-      width: certificateRef.current.offsetWidth,
-      height: certificateRef.current.offsetHeight,
-    });
-    const link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
-    link.download = `result-${(result.student?.name || 'student').replace(/\s+/g, '-').toLowerCase()}-${(result.exam?.title || 'exam').replace(/\s+/g, '-').toLowerCase()}.png`;
-    link.click();
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = '-10000px';
+    wrapper.style.top = '0';
+    wrapper.style.padding = '20px';
+    wrapper.style.background = '#081428';
+    wrapper.style.width = '380px';
+    wrapper.style.boxSizing = 'border-box';
+
+    const clone = certificateRef.current.cloneNode(true);
+    clone.style.margin = '0 auto';
+    clone.style.boxShadow = 'none';
+    clone.style.transform = 'none';
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    try {
+      const canvas = await html2canvas(wrapper, {
+        scale: 4,
+        backgroundColor: '#081428',
+        useCORS: true,
+        width: wrapper.offsetWidth,
+        height: wrapper.offsetHeight,
+      });
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `result-${(result.student?.name || 'student').replace(/\s+/g, '-').toLowerCase()}-${(result.exam?.title || 'exam').replace(/\s+/g, '-').toLowerCase()}.png`;
+      link.click();
+    } finally {
+      document.body.removeChild(wrapper);
+    }
   };
 
   return <>
