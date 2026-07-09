@@ -13,6 +13,13 @@ const createBlank = () => ({
   correctAnswer: 'A', marks: 1, negativeMarks: 0, difficulty: 'medium',
 });
 
+const createBulkState = () => ({
+  text: '',
+  marks: 1,
+  negativeMarks: 0,
+  difficulty: 'medium',
+});
+
 export default function Questions() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -21,6 +28,8 @@ export default function Questions() {
   const [form, setForm] = useState(createBlank);
   const [show, setShow] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [bulk, setBulk] = useState(createBulkState);
+  const [bulkSaving, setBulkSaving] = useState(false);
   const [deploying, setDeploying] = useState(false);
   const [examLink, setExamLink] = useState('');
 
@@ -71,6 +80,42 @@ export default function Questions() {
       await load();
     } catch (error) {
       toast.error(messageFrom(error));
+    }
+  };
+
+  const uploadTextFile = async event => {
+    const [file] = event.target.files || [];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      setBulk(current => ({ ...current, text }));
+      toast.success('Question text file loaded');
+    } catch {
+      toast.error('Could not read the selected text file');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
+  const bulkSubmit = async event => {
+    event.preventDefault();
+    let parsed;
+    try {
+      parsed = parseQuestionText(bulk.text, bulk);
+    } catch (error) {
+      return toast.error(error.message);
+    }
+    if (!parsed.length) return toast.error('No valid questions found in the uploaded text');
+    setBulkSaving(true);
+    try {
+      await api.post(`/exams/${id}/questions/bulk`, { questions: parsed });
+      toast.success(`${parsed.length} questions imported successfully`);
+      setBulk(createBulkState());
+      await load();
+    } catch (error) {
+      toast.error(messageFrom(error));
+    } finally {
+      setBulkSaving(false);
     }
   };
 
@@ -128,6 +173,19 @@ export default function Questions() {
       <button type="button" onClick={() => setShow(current => !current)} className="btn-primary"><HiOutlinePlus/>{show ? 'Close question form' : 'Add question'}</button>
     </div>
 
+    <form onSubmit={bulkSubmit} className="card mb-6 grid gap-4 md:grid-cols-2">
+      <div className="md:col-span-2">
+        <h3 className="text-lg font-bold">Import questions from text file</h3>
+        <p className="mt-1 text-sm text-slate-500">Upload a `.txt` file or paste text in the same format as `Q1`, `A.`, `B.`, `C.`, `D.`, and `Answer: B`.</p>
+      </div>
+      <label><span className="label">Upload text file</span><input type="file" accept=".txt,text/plain" className="field file:mr-4 file:rounded-lg file:border-0 file:bg-primary-50 file:px-3 file:py-2 file:font-semibold file:text-primary-700" onChange={uploadTextFile}/></label>
+      <label><span className="label">Difficulty</span><select className="field" value={bulk.difficulty} onChange={event => setBulk(current => ({ ...current, difficulty: event.target.value }))}>{['easy', 'medium', 'hard'].map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+      <label><span className="label">Marks for all imported questions</span><input required type="number" min="0.25" step="0.25" className="field" value={bulk.marks} onChange={event => setBulk(current => ({ ...current, marks: event.target.value }))}/></label>
+      <label><span className="label">Negative marks</span><input required type="number" min="0" step="0.25" className="field" value={bulk.negativeMarks} onChange={event => setBulk(current => ({ ...current, negativeMarks: event.target.value }))}/></label>
+      <label className="md:col-span-2"><span className="label">Question text</span><textarea required className="field min-h-72 font-mono text-sm" value={bulk.text} onChange={event => setBulk(current => ({ ...current, text: event.target.value }))} placeholder={`Q6. Which attribute specifies the image location?\n\nA. href\nB. src\nC. alt\nD. path\n\nAnswer: B`}/></label>
+      <button disabled={bulkSaving} className="btn-primary md:col-span-2">{bulkSaving ? 'Importing…' : 'Import questions automatically'}</button>
+    </form>
+
     {show && <form onSubmit={submit} className="card mb-6 grid gap-4 md:grid-cols-2">
       <label className="md:col-span-2"><span className="label">Question</span><textarea required className="field min-h-24" value={form.text} onChange={event => setForm({ ...form, text: event.target.value })} placeholder="Enter the question"/></label>
       {form.options.map((option, index) => <label key={option.key}><span className="label">Option {option.key}</span><input required className="field" value={option.text} onChange={event => updateOption(index, event.target.value)} placeholder={`Answer option ${option.key}`}/></label>)}
@@ -153,4 +211,39 @@ export default function Questions() {
 
 function Summary({ label, value }) {
   return <div><p className="text-xs uppercase tracking-wider text-slate-400">{label}</p><p className="mt-1 font-bold capitalize">{value}</p></div>;
+}
+
+function parseQuestionText(text, defaults) {
+  const normalized = text.replace(/\r/g, '').replace(/✅/g, '').trim();
+  if (!normalized) throw new Error('Please upload or paste question text first');
+  const blocks = normalized
+    .split(/\n(?=Q\d+[.)]\s*)/i)
+    .map(item => item.trim())
+    .filter(Boolean);
+  if (!blocks.length) throw new Error('Could not find any questions in the file');
+
+  return blocks.map((block, index) => {
+    const lines = block.split('\n').map(line => line.trim()).filter(Boolean);
+    const questionLine = lines[0];
+    const questionText = questionLine.replace(/^Q\d+[.)]\s*/i, '').trim();
+    const options = ['A', 'B', 'C', 'D'].map(key => {
+      const line = lines.find(item => new RegExp(`^${key}[.)]\\s*`, 'i').test(item));
+      if (!line) throw new Error(`Missing option ${key} in question ${index + 1}`);
+      return { key, text: line.replace(new RegExp(`^${key}[.)]\\s*`, 'i'), '').trim() };
+    });
+    const answerLine = lines.find(item => /^answer\s*:/i.test(item));
+    if (!answerLine) throw new Error(`Missing answer line in question ${index + 1}`);
+    const correctAnswer = (answerLine.match(/([A-D])$/i)?.[1] || '').toUpperCase();
+    if (!correctAnswer) throw new Error(`Invalid answer format in question ${index + 1}`);
+
+    return {
+      type: 'mcq',
+      text: questionText,
+      options,
+      correctAnswer,
+      marks: Number(defaults.marks),
+      negativeMarks: Number(defaults.negativeMarks),
+      difficulty: defaults.difficulty,
+    };
+  });
 }

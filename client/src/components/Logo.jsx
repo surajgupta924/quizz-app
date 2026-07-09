@@ -1,2 +1,21 @@
-import { HiOutlineAcademicCap } from 'react-icons/hi2';
-export default function Logo({ compact = false }) { return <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-primary-600 to-cyan text-2xl text-white shadow-lg"><HiOutlineAcademicCap/></span>{!compact && <div><div className="text-lg font-extrabold tracking-tight">CodingClave Development</div><div className="text-[10px] font-semibold uppercase tracking-[.16em] text-slate-400">Software · Learning · Growth</div></div>}</div>; }
+import codingClaveLogo from '../assets/codingclave-logo.svg';
+
+export function BrandMark({ size = 'md', dark = false }) {
+  const sizes = {
+    sm: 'h-9 w-9',
+    md: 'h-11 w-11',
+    lg: 'h-14 w-14',
+  };
+  return <img src={codingClaveLogo} alt="CodingClave logo" className={`${sizes[size]} ${dark ? '' : 'drop-shadow-sm'}`}/>;
+}
+
+export default function Logo({ compact = false }) {
+  return <div className="flex items-center gap-3">
+    <BrandMark/>
+    {!compact && <div>
+      <div className="text-lg font-extrabold tracking-tight leading-5">Coding Clave</div>
+      <div className="text-base font-extrabold tracking-tight leading-5">Development LLP</div>
+      <div className="text-[10px] font-semibold tracking-[.04em] text-slate-400">Code. Create. Clave.</div>
+    </div>}
+  </div>;
+}

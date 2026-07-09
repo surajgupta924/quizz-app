@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { HiOutlineArrowDownTray } from 'react-icons/hi2';
 import api, { messageFrom } from '../../services/api';
 import { ResultCertificate } from '../../components/resultTemplates';
@@ -30,16 +29,16 @@ export default function Results() {
   const download = async () => {
     if (!certificateRef.current) return;
     const canvas = await html2canvas(certificateRef.current, {
-      scale: 3,
-      backgroundColor: null,
+      scale: 4,
+      backgroundColor: '#081428',
       useCORS: true,
+      width: certificateRef.current.offsetWidth,
+      height: certificateRef.current.offsetHeight,
     });
-    const image = canvas.toDataURL('image/png');
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [170, 95] });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    pdf.addImage(image, 'PNG', 0, 0, pageWidth, pageHeight);
-    pdf.save(`result-${(result.student?.name || 'student').replace(/\s+/g, '-').toLowerCase()}-${(result.exam?.title || 'exam').replace(/\s+/g, '-').toLowerCase()}.pdf`);
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = `result-${(result.student?.name || 'student').replace(/\s+/g, '-').toLowerCase()}-${(result.exam?.title || 'exam').replace(/\s+/g, '-').toLowerCase()}.png`;
+    link.click();
   };
 
   return <>

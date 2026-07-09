@@ -1,7 +1,8 @@
+import { BrandMark } from './Logo';
 import { getResultTemplate, RESULT_TEMPLATES } from '../constants/resultTemplates';
 
 export function TemplateSelector({ value, onChange }) {
-  return <div className="grid gap-4 xl:grid-cols-2">
+  return <div className="grid gap-4">
     {RESULT_TEMPLATES.map(template => {
       const active = template.id === value;
       return <button
@@ -11,7 +12,7 @@ export function TemplateSelector({ value, onChange }) {
         className={`overflow-hidden rounded-[1.6rem] border text-left transition hover:-translate-y-0.5 ${active ? 'border-primary-500 ring-4 ring-primary-500/10' : 'border-slate-200 hover:border-primary-300 dark:border-white/10'}`}
       >
         <div className="bg-[#f7f8fc] p-4 dark:bg-[#0d0c1b]">
-          <div className="mx-auto origin-top scale-[0.72]">
+          <div className="mx-auto w-fit origin-top scale-[0.72]">
             <CertificateCard template={template} result={previewResult(template)}/>
           </div>
         </div>
@@ -53,7 +54,6 @@ function CertificateCard({ template, result, certificateRef }) {
   const textMain = dark ? 'text-white' : 'text-slate-900';
   const textMuted = dark ? 'text-white/70' : 'text-slate-500';
   const panel = dark ? 'bg-[#091323]' : 'bg-white';
-  const iconFrame = dark ? 'border-white/30 bg-white/10' : 'border-slate-200 bg-white';
   const name = result.student?.name || 'Student Name';
   const subject = result.exam?.subject || result.exam?.title || 'Subject Name';
   const marks = `${result.score ?? 0} / ${result.exam?.totalMarks ?? 100}`;
@@ -63,14 +63,12 @@ function CertificateCard({ template, result, certificateRef }) {
   const wrong = result.wrong ?? 0;
   const skipped = result.skipped ?? 0;
 
-  return <article ref={certificateRef} className={`relative w-full max-w-[340px] overflow-hidden rounded-[18px] border shadow-2xl ${panel} ${dark ? 'border-white/10' : 'border-slate-200'}`}>
+  return <article ref={certificateRef} className={`relative w-[340px] overflow-hidden rounded-[18px] border shadow-2xl ${panel} ${dark ? 'border-white/10' : 'border-slate-200'}`}>
     <div className={`h-4 ${template.edge}`}/>
     <div className={`px-5 pb-4 pt-4 ${textMain}`}>
       <div className="flex items-start justify-between">
         <div className="flex gap-3">
-          <div className={`grid h-11 w-11 place-items-center rounded-full border-4 text-lg font-black ${iconFrame}`} style={{ color: template.accent, borderColor: template.accent }}>
-            C
-          </div>
+          <BrandMark dark={dark}/>
           <div>
             <h2 className="text-[18px] font-black uppercase tracking-tight leading-5">Coding Clave</h2>
             <p className="text-[13px] font-bold uppercase leading-4">Development LLP</p>
@@ -89,12 +87,8 @@ function CertificateCard({ template, result, certificateRef }) {
       <div className="mt-5 flex justify-center">
         <div className={`relative grid h-28 w-28 place-items-center rounded-full border-[7px] ${dark ? 'bg-[#0f1f37]' : 'bg-white'}`} style={{ borderColor: template.accent }}>
           <div className={`grid h-20 w-20 place-items-center rounded-full border-[7px] ${dark ? 'bg-white text-slate-900' : 'bg-[#0f2147] text-white'}`} style={{ borderColor: dark ? '#d9dee7' : '#e6ebf3' }}>
-            <span className="text-4xl font-black">C</span>
+            <BrandMark size="lg" dark={false}/>
           </div>
-          {(template.code === '01' || template.code === '09') && <>
-            <span className="absolute -left-8 top-5 text-4xl" style={{ color: template.medal }}>❦</span>
-            <span className="absolute -right-8 top-5 text-4xl" style={{ color: template.medal }}>❦</span>
-          </>}
         </div>
       </div>
 

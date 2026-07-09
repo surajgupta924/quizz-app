@@ -22,7 +22,7 @@ const initialSchedule = () => {
 const createEmptyExam = () => ({
   title: '', description: '', subject: '', duration: 60,
   ...initialSchedule(),
-  passingMarks: 40, totalMarks: 100, negativeMarking: false, status: 'scheduled', resultTemplate: 'template-01',
+  passingMarks: 40, totalMarks: 100, negativeMarking: false, status: 'scheduled', resultTemplate: 'template-05',
 });
 
 export default function ExamForm() {
@@ -102,8 +102,8 @@ export default function ExamForm() {
       <Field label="Total marks" type="number" min="1" name="totalMarks" value={form.totalMarks} onChange={set}/>
       <div className="md:col-span-2">
         <span className="label">Student result template</span>
-        <TemplateSelector value={normalizeResultTemplate(form.resultTemplate)} onChange={value => setForm(current => ({ ...current, resultTemplate: value }))}/>
-        <p className="mt-2 text-xs text-slate-400">The student result page will use the selected certificate design.</p>
+        <TemplateSelector value="template-05" onChange={() => {}}/>
+        <p className="mt-2 text-xs text-slate-400">Only one official CodingClave result template is active right now.</p>
       </div>
       <label className="flex items-center gap-3 rounded-xl border p-4 md:col-span-2"><input type="checkbox" name="negativeMarking" checked={form.negativeMarking} onChange={set} className="h-5 w-5 accent-primary-600"/><span><b>Enable negative marking</b><p className="text-xs text-slate-500">Deduct configured marks for incorrect answers.</p></span></label>
       <div className="flex justify-end gap-3 md:col-span-2"><button type="button" className="btn-ghost" onClick={() => navigate(-1)}>Cancel</button><button disabled={loading} className="btn-primary">{loading ? 'Saving…' : id ? 'Save changes' : 'Schedule exam'}</button></div>
