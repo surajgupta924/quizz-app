@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { HiOutlineArrowDownTray } from 'react-icons/hi2';
 import api, { messageFrom } from '../../services/api';
 import { ResultCertificate } from '../../components/resultTemplates';
@@ -13,6 +13,7 @@ export default function Results() {
   const { id } = useParams();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const certificateRef = useRef(null);
   useEffect(() => {
     let active = true;
     setData(null); setError('');
@@ -26,25 +27,25 @@ export default function Results() {
   if (!id) return <ResultList items={Array.isArray(data) ? data : []}/>;
 
   const { result, reviewItems } = data;
-  const download = () => {
-    const doc = new jsPDF();
-    doc.setFillColor(79, 70, 229); doc.rect(0, 0, 210, 34, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(19); doc.text('CODINGCLAVE DEVELOPMENT LLP', 14, 15);
-    doc.setFontSize(10); doc.text('Software Development Company · Official Examination Result', 14, 24);
-    doc.setTextColor(30, 41, 59); doc.setFontSize(14); doc.text(`${result.exam.title} — ${result.exam.subject}`, 14, 45);
-    autoTable(doc, { startY: 52, head: [['Result detail', 'Value']], body: [
-      ['Student', result.student?.name || 'Student'], ['Score', `${result.score} / ${result.exam.totalMarks}`],
-      ['Percentage', `${result.percentage}%`], ['Correct', result.correct], ['Wrong', result.wrong],
-      ['Not attempted', result.skipped], ['Rank', result.rank || '-'], ['Result', result.passed ? 'PASS' : 'FAIL'],
-      ['Submitted', new Date(result.submittedAt).toLocaleString()],
-    ] });
-    doc.save(`result-${result.exam.title.replace(/\s+/g, '-')}.pdf`);
+  const download = async () => {
+    if (!certificateRef.current) return;
+    const canvas = await html2canvas(certificateRef.current, {
+      scale: 3,
+      backgroundColor: null,
+      useCORS: true,
+    });
+    const image = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [170, 95] });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    pdf.addImage(image, 'PNG', 0, 0, pageWidth, pageHeight);
+    pdf.save(`result-${(result.student?.name || 'student').replace(/\s+/g, '-').toLowerCase()}-${(result.exam?.title || 'exam').replace(/\s+/g, '-').toLowerCase()}.pdf`);
   };
 
   return <>
-    <PageHeader eyebrow="CodingClave Development LLP" title={`${result.exam.title} — Official Result`} text={`Institute assessment record · Submitted ${new Date(result.submittedAt).toLocaleString()}`} action={<button onClick={download} className="btn-primary"><HiOutlineArrowDownTray/>Download PDF</button>}/>
+    <PageHeader eyebrow="CodingClave Development LLP" title={`${result.exam.title} — Official Result`} text={`Institute assessment record · Submitted ${new Date(result.submittedAt).toLocaleString()}`} action={<button onClick={download} className="btn-primary"><HiOutlineArrowDownTray/>Print Result</button>}/>
     <div className="mx-auto max-w-5xl space-y-6">
-      <ResultCertificate result={result}/>
+      <ResultCertificate result={result} certificateRef={certificateRef}/>
       <ReviewSection items={reviewItems}/>
     </div>
   </>;

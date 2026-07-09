@@ -1,4 +1,3 @@
-import { HiOutlineCheckCircle, HiOutlineMinusCircle, HiOutlineTrophy, HiOutlineXCircle } from 'react-icons/hi2';
 import { getResultTemplate, RESULT_TEMPLATES } from '../constants/resultTemplates';
 
 export function TemplateSelector({ value, onChange }) {
@@ -28,10 +27,10 @@ export function TemplateSelector({ value, onChange }) {
   </div>;
 }
 
-export function ResultCertificate({ result }) {
+export function ResultCertificate({ result, certificateRef }) {
   const template = getResultTemplate(result.exam?.resultTemplate);
   return <div className="flex justify-center">
-    <CertificateCard template={template} result={result}/>
+    <CertificateCard template={template} result={result} certificateRef={certificateRef}/>
   </div>;
 }
 
@@ -49,21 +48,22 @@ function previewResult(template) {
   return base;
 }
 
-function CertificateCard({ template, result }) {
+function CertificateCard({ template, result, certificateRef }) {
   const dark = template.theme === 'dark';
   const textMain = dark ? 'text-white' : 'text-slate-900';
   const textMuted = dark ? 'text-white/70' : 'text-slate-500';
   const panel = dark ? 'bg-[#091323]' : 'bg-white';
-  const rankTone = dark ? 'text-amber-300' : 'text-slate-700';
-  const qrTone = dark ? 'border-white/20 bg-white text-slate-900' : 'border-slate-300 bg-white text-slate-900';
   const iconFrame = dark ? 'border-white/30 bg-white/10' : 'border-slate-200 bg-white';
   const name = result.student?.name || 'Student Name';
-  const college = result.student?.college || 'Registered Student';
   const subject = result.exam?.subject || result.exam?.title || 'Subject Name';
   const marks = `${result.score ?? 0} / ${result.exam?.totalMarks ?? 100}`;
   const rank = rankLabel(result.rank);
+  const percentage = `${result.percentage ?? 0}%`;
+  const correct = result.correct ?? 0;
+  const wrong = result.wrong ?? 0;
+  const skipped = result.skipped ?? 0;
 
-  return <article className={`relative w-full max-w-[340px] overflow-hidden rounded-[18px] border shadow-2xl ${panel} ${dark ? 'border-white/10' : 'border-slate-200'}`}>
+  return <article ref={certificateRef} className={`relative w-full max-w-[340px] overflow-hidden rounded-[18px] border shadow-2xl ${panel} ${dark ? 'border-white/10' : 'border-slate-200'}`}>
     <div className={`h-4 ${template.edge}`}/>
     <div className={`px-5 pb-4 pt-4 ${textMain}`}>
       <div className="flex items-start justify-between">
@@ -103,17 +103,10 @@ function CertificateCard({ template, result }) {
         <InfoRow icon="◨" label="Student Name" value={name}/>
         <InfoRow icon="✦" label="Marks Obtained" value={marks}/>
         <InfoRow icon="♛" label="Rank" value={rank}/>
-      </div>
-
-      <div className="mt-5 flex items-end justify-between gap-3">
-        <div className="flex-1">
-          <div className={`h-px ${dark ? 'bg-white/20' : 'bg-slate-300'}`}/>
-          <p className={`mt-2 text-[10px] italic ${textMuted}`}>Authorized Signatory</p>
-          <p className={`mt-1 text-[10px] ${textMuted}`}>{college}</p>
-        </div>
-        <div className={`grid h-16 w-16 grid-cols-5 gap-[2px] rounded border p-1 ${qrTone}`}>
-          {Array.from({ length: 25 }).map((_, index) => <span key={index} className={`${qrDot(index) ? 'bg-slate-900' : 'bg-transparent'}`}/>)}
-        </div>
+        <InfoRow icon="%" label="Percentage" value={percentage}/>
+        <InfoRow icon="✓" label="Correct" value={correct}/>
+        <InfoRow icon="✕" label="Wrong" value={wrong}/>
+        <InfoRow icon="•" label="Skipped" value={skipped}/>
       </div>
     </div>
     <div className={`flex items-center justify-between px-5 py-3 text-[11px] font-bold ${dark ? 'bg-white/5 text-white/80' : 'bg-slate-50 text-slate-700'}`}>
@@ -150,9 +143,4 @@ function rankLabel(rank) {
   if (num % 10 === 2) return `${num}nd`;
   if (num % 10 === 3) return `${num}rd`;
   return `${num}th`;
-}
-
-function qrDot(index) {
-  const filled = new Set([0, 1, 2, 5, 7, 9, 10, 11, 14, 15, 17, 18, 20, 22, 23, 24]);
-  return filled.has(index);
 }
