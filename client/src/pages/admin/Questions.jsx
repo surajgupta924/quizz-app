@@ -49,7 +49,7 @@ export default function Questions() {
       text: item.text.trim(),
       options: item.options.map(option => ({ ...option, text: option.text.trim() })),
       marks: Number(item.marks),
-      negativeMarks: Number(item.negativeMarks),
+      negativeMarks: exam?.negativeMarking ? Number(item.negativeMarks) : 0,
     }));
 
     if (payload.some(item => !item.text)) return toast.error('Enter each question before saving');
@@ -169,7 +169,7 @@ export default function Questions() {
           <label><span className="label">Correct answer</span><select className="field" value={form.correctAnswer} onChange={event => updateForm(formIndex, 'correctAnswer', event.target.value)}>{form.options.map(option => <option key={option.key} value={option.key}>{option.key}. {option.text || `Option ${option.key}`}</option>)}</select></label>
           <label><span className="label">Difficulty</span><select className="field" value={form.difficulty} onChange={event => updateForm(formIndex, 'difficulty', event.target.value)}>{['easy', 'medium', 'hard'].map(value => <option key={value} value={value}>{value}</option>)}</select></label>
           <label><span className="label">Marks</span><input required type="number" min="0.25" step="0.25" className="field" value={form.marks} onChange={event => updateForm(formIndex, 'marks', event.target.value)}/></label>
-          <label><span className="label">Negative marks</span><input required type="number" min="0" step="0.25" className="field" value={form.negativeMarks} onChange={event => updateForm(formIndex, 'negativeMarks', event.target.value)}/></label>
+          {exam?.negativeMarking && <label><span className="label">Negative marks</span><input required type="number" min="0" step="0.25" className="field" value={form.negativeMarks} onChange={event => updateForm(formIndex, 'negativeMarks', event.target.value)}/></label>}
         </div>
       </div>)}
       <div className="flex gap-3 md:col-span-2">

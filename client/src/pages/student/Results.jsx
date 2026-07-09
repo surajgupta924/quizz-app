@@ -42,7 +42,7 @@ export default function Results() {
   };
 
   return <>
-    <PageHeader eyebrow="CodingClave Development LLP" title={`${result.exam.title} — Official Result`} text={`Institute assessment record · Submitted ${new Date(result.submittedAt).toLocaleString()}`} action={<button onClick={download} className="btn-primary"><HiOutlineArrowDownTray/>Print Result</button>}/>
+    <PageHeader eyebrow="CodingClave Development LLP" title={`${result.exam.title} — Official Result`} text={`Institute assessment record · Submitted ${new Date(result.submittedAt).toLocaleString()}`} action={<button onClick={download} className="btn-primary"><HiOutlineArrowDownTray/>Download Result</button>}/>
     <div className="mx-auto max-w-5xl space-y-6">
       <ResultCertificate result={result} certificateRef={certificateRef}/>
       <ReviewSection items={reviewItems}/>

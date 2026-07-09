@@ -37,14 +37,11 @@ export function ResultCertificate({ result, certificateRef }) {
 
 function previewResult(template) {
   const base = {
-    student: { name: 'Student Name', college: 'Your College Name' },
+    student: { name: 'Vivek Tiwari' },
     exam: { subject: 'Subject Name' },
-    score: 86,
-    percentage: 86,
-    rank: rankLabel(template.code),
-    correct: 18,
-    wrong: 2,
-    skipped: 0,
+    score: 74,
+    totalMarks: 100,
+    rank: 5,
   };
   return base;
 }
@@ -52,20 +49,28 @@ function previewResult(template) {
 function CertificateCard({ template, result, certificateRef }) {
   const dark = template.theme === 'dark';
   const textMain = dark ? 'text-white' : 'text-slate-900';
-  const textMuted = dark ? 'text-white/70' : 'text-slate-500';
+  const textMuted = dark ? 'text-white/80' : 'text-slate-500';
   const panel = dark ? 'bg-[#091323]' : 'bg-white';
   const name = result.student?.name || 'Student Name';
   const subject = result.exam?.subject || result.exam?.title || 'Subject Name';
   const marks = `${result.score ?? 0} / ${result.exam?.totalMarks ?? 100}`;
   const rank = rankLabel(result.rank);
-  const percentage = `${result.percentage ?? 0}%`;
-  const correct = result.correct ?? 0;
-  const wrong = result.wrong ?? 0;
-  const skipped = result.skipped ?? 0;
 
-  return <article ref={certificateRef} className={`relative w-[340px] overflow-hidden rounded-[18px] border shadow-2xl ${panel} ${dark ? 'border-white/10' : 'border-slate-200'}`}>
-    <div className={`h-4 ${template.edge}`}/>
-    <div className={`px-5 pb-4 pt-4 ${textMain}`}>
+  return <article ref={certificateRef} className={`relative w-[340px] overflow-hidden rounded-[18px] border shadow-2xl ${panel} ${dark ? 'border-[#d8a117]' : 'border-slate-200'}`}>
+    <div className={`absolute inset-0 ${dark ? 'bg-[radial-gradient(circle_at_left,_rgba(242,180,52,0.15)_0,_rgba(242,180,52,0)_30%)]' : ''}`}/>
+    <div className="absolute left-0 right-0 top-0 h-4 bg-[#f2b434]"/>
+    <div className="absolute right-3 top-0 h-16 w-16 border-r-2 border-t-2 border-[#f2b434] opacity-80"/>
+    <div className="absolute bottom-20 left-4 h-16 w-12 opacity-25">
+      <div className="grid grid-cols-4 gap-[3px]">
+        {Array.from({ length: 24 }).map((_, index) => <span key={index} className={`h-[3px] w-[3px] rounded-full ${index % 2 === 0 ? 'bg-[#f2b434]' : 'bg-transparent'}`}/>)}
+      </div>
+    </div>
+    <div className="absolute right-0 top-24 bottom-28 w-20 opacity-80">
+      <div className="absolute right-2 top-0 h-full w-px rotate-[27deg] bg-[#f2b434]"/>
+      <div className="absolute right-7 top-2 h-full w-px rotate-[27deg] bg-[#f2b434]"/>
+      <div className="absolute right-12 top-4 h-full w-px rotate-[27deg] bg-[#f2b434]"/>
+    </div>
+    <div className={`relative px-5 pb-4 pt-8 ${textMain}`}>
       <div className="flex items-start justify-between">
         <div className="flex gap-3">
           <BrandMark dark={dark}/>
@@ -75,35 +80,35 @@ function CertificateCard({ template, result, certificateRef }) {
             <p className={`text-[11px] ${textMuted}`}>Code. Create. Clave.</p>
           </div>
         </div>
-        <span className={`rounded-md px-2 py-1 text-xs font-black ${dark ? 'bg-white text-slate-900' : 'bg-slate-100 text-slate-700'}`}>{template.code}</span>
+        <span className={`rounded-md px-2.5 py-1 text-xs font-black ${dark ? 'bg-white text-slate-900' : 'bg-slate-100 text-slate-700'}`}>{template.code}</span>
       </div>
 
-      <div className="mt-4 flex justify-center">
-        <div className={`relative px-6 py-2 text-[15px] font-black uppercase tracking-wide text-white ${template.ribbon}`} style={{ clipPath: 'polygon(0 0, 100% 0, 94% 100%, 6% 100%)' }}>
+      <div className="mt-5 flex justify-center">
+        <div className={`relative px-7 py-2 text-[15px] font-black uppercase tracking-wide text-white ${template.ribbon}`} style={{ clipPath: 'polygon(0 0, 100% 0, 94% 100%, 6% 100%)' }}>
           Quiz Test Result
         </div>
       </div>
 
-      <div className="mt-5 flex justify-center">
-        <div className={`relative grid h-28 w-28 place-items-center rounded-full border-[7px] ${dark ? 'bg-[#0f1f37]' : 'bg-white'}`} style={{ borderColor: template.accent }}>
-          <div className={`grid h-20 w-20 place-items-center rounded-full border-[7px] ${dark ? 'bg-white text-slate-900' : 'bg-[#0f2147] text-white'}`} style={{ borderColor: dark ? '#d9dee7' : '#e6ebf3' }}>
-            <BrandMark size="lg" dark={false}/>
+      <div className="mt-6 flex justify-center">
+        <div className="relative grid h-32 w-32 place-items-center">
+          <div className="absolute inset-0 rotate-45 border-[3px] border-[#f2b434]"/>
+          <div className="absolute inset-[7px] rotate-45 border-2 border-[#f2b434]"/>
+          <div className={`relative grid h-24 w-24 place-items-center rounded-2xl ${dark ? 'bg-[#0b1424]' : 'bg-white'}`}>
+            <div className="flex scale-[1.05] items-center justify-center">
+              <BrandMark size="lg" dark={false}/>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className={`mt-5 space-y-2.5 text-[12px] ${dark ? 'text-white' : 'text-slate-800'}`}>
+      <div className={`mt-7 space-y-3 text-[12px] ${dark ? 'text-white' : 'text-slate-800'}`}>
         <InfoRow icon="◧" label="Subject Name" value={subject}/>
         <InfoRow icon="◨" label="Student Name" value={name}/>
         <InfoRow icon="✦" label="Marks Obtained" value={marks}/>
         <InfoRow icon="♛" label="Rank" value={rank}/>
-        <InfoRow icon="%" label="Percentage" value={percentage}/>
-        <InfoRow icon="✓" label="Correct" value={correct}/>
-        <InfoRow icon="✕" label="Wrong" value={wrong}/>
-        <InfoRow icon="•" label="Skipped" value={skipped}/>
       </div>
     </div>
-    <div className={`flex items-center justify-between px-5 py-3 text-[11px] font-bold ${dark ? 'bg-white/5 text-white/80' : 'bg-slate-50 text-slate-700'}`}>
+    <div className={`relative flex items-center justify-between px-5 py-3 text-[11px] font-bold ${dark ? 'bg-white/5 text-white/80' : 'bg-slate-50 text-slate-700'}`}>
       <span>www.codingclave.com</span>
       <Badge template={template} rank={rank}/>
     </div>
@@ -123,7 +128,7 @@ function Badge({ template, rank }) {
   const isGold = ['01', '05', '09'].includes(template.code);
   const bg = isGold ? 'bg-amber-400 text-amber-950' : 'bg-blue-600 text-white';
   const star = isGold ? '★' : '✪';
-  return <div className={`grid h-12 w-12 place-items-center rounded-full text-[11px] font-black shadow ${bg}`}>
+  return <div className={`grid h-14 w-14 place-items-center rounded-full border-[3px] border-[#d48c18] text-[11px] font-black shadow ${bg}`}>
     <span className="text-center leading-3">{star}<br/>{rank}</span>
   </div>;
 }
