@@ -1,5 +1,6 @@
 import { BrandMark } from './Logo';
 import { getResultTemplate, RESULT_TEMPLATES } from '../constants/resultTemplates';
+import resultCenterLogo from '../assets/result-center-logo.png';
 
 export function TemplateSelector({ value, onChange }) {
   return <div className="grid gap-4">
@@ -93,10 +94,8 @@ function CertificateCard({ template, result, certificateRef }) {
         <div className="relative grid h-32 w-32 place-items-center">
           <div className="absolute inset-0 rotate-45 border-[3px] border-[#f2b434]"/>
           <div className="absolute inset-[7px] rotate-45 border-2 border-[#f2b434]"/>
-          <div className={`relative grid h-24 w-24 place-items-center rounded-2xl ${dark ? 'bg-[#0b1424]' : 'bg-white'}`}>
-            <div className="flex scale-[1.05] items-center justify-center">
-              <BrandMark size="lg" dark={false}/>
-            </div>
+          <div className={`relative grid h-24 w-24 place-items-center overflow-hidden rounded-2xl ${dark ? 'bg-[#0b1424]' : 'bg-white'}`}>
+            <img src={resultCenterLogo} alt="CodingClave result logo" className="h-20 w-20 object-contain"/>
           </div>
         </div>
       </div>
